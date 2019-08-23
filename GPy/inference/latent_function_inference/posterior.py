@@ -1,6 +1,7 @@
 # Copyright (c) 2012, GPy authors (see AUTHORS.txt).
 # Licensed under the BSD 3-clause license (see LICENSE.txt)
 
+import math 
 import numpy as np
 from ...util.linalg import pdinv, dpotrs, dpotri, symmetrify, jitchol, dtrtrs, tdot
 from GPy.core.parameterization.variational import VariationalPosterior
@@ -227,7 +228,7 @@ class Posterior(object):
         # x_new must be (1, N) array, where N is the dim. of x
         Kx = kern.K(pred_var, x_new)
         Kxx = kern.K(x_new)
-        H = self._K_det + np.linalg.det(Kxx - Kx.transpose().dot(self._K_inv).dot(Kx))
+        H = self._K_det * np.linalg.det(Kxx - Kx.transpose().dot(self._K_inv).dot(Kx))
         return H
 
     def _raw_predict(self, kern, Xnew, pred_var, full_cov=False):
