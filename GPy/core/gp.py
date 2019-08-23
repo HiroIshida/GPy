@@ -276,6 +276,10 @@ class GP(Model):
         """
         return self._log_marginal_likelihood
 
+    def compute_entropy(self, x_new):
+        H = self.posterior._compute_entropy(self.kern, x_new, self._predictive_variable)
+        return H
+
     def _raw_predict(self, Xnew, full_cov=False, kern=None):
         """
         For making predictions, does not account for normalization or likelihood
