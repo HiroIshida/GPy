@@ -3,6 +3,7 @@
 
 import math 
 import numpy as np
+from numpy.linalg import det, inv
 from ...util.linalg import pdinv, dpotrs, dpotri, symmetrify, jitchol, dtrtrs, tdot
 from GPy.core.parameterization.variational import VariationalPosterior
 
@@ -60,8 +61,6 @@ class Posterior(object):
 
         self._K_chol = K_chol
         self._K = K
-        self._K_inv = np.linalg.inv(K)
-        self._K_det = np.linalg.det(K)
 
         # option 1:
         self._woodbury_chol = woodbury_chol
@@ -223,12 +222,11 @@ class Posterior(object):
 
     def _compute_entropy(self, kern, x_new, pred_var):
         # TODO x_new must be any dim vectors
-
         # differential entropy
         # x_new must be (1, N) array, where N is the dim. of x
         Kx = kern.K(pred_var, x_new)
         Kxx = kern.K(x_new)
-        H = self._K_det * np.linalg.det(Kxx - Kx.transpose().dot(self._K_inv).dot(Kx))
+        H = Kxx.item() * det(self._K - Kx.dot(inv(Kxx)).dot(Kx.transpose()))
         return H
 
     def _raw_predict(self, kern, Xnew, pred_var, full_cov=False):
