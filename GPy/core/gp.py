@@ -109,6 +109,15 @@ class GP(Model):
         self.link_parameter(self.likelihood)
         self.posterior = None
 
+    def get_boundary(self, margin = 0.0):
+        x_lst_lst = [[e[i] for e in self.X.tolist()] for i in range(2)]
+        bmin_ = np.array([min(x_lst) for x_lst in x_lst_lst])
+        bmax_ = np.array([max(x_lst) for x_lst in x_lst_lst])
+        dif = bmax_ - bmin_
+        bmin = bmin_ - margin * dif
+        bmax = bmax_ + margin * dif
+        return bmin, bmax
+
     def to_dict(self, save_data=True):
         """
         Convert the object into a json serializable dictionary.
